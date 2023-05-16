@@ -8,6 +8,7 @@ plugins {
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
+_minimum = 0.7
 
 repositories {
 	mavenCentral()
@@ -27,7 +28,7 @@ jacocoTestCoverageVerification {
   violationRules {
     rule {
       limit {
-        minimum = 0.7
+        minimum = _minimum
       }
     }
   }

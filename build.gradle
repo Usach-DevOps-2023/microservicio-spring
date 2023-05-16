@@ -23,7 +23,7 @@ jacoco {
     reportsDir = file("$buildDir/reports/jacoco")
 }
 
-/*jacocoTestCoverageVerification {
+jacocoTestCoverageVerification {
   violationRules {
     rule {
       limit {
@@ -31,7 +31,7 @@ jacoco {
       }
     }
   }
-}*/
+}
 
 jacocoTestReport {
   reports {

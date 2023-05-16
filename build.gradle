@@ -23,11 +23,6 @@ jacoco {
   reportsDir = file("$buildDir/reports/jacoco")
 }
 
-test {
-  useJUnitPlatform()
-  finalizedBy jacocoTestReport
-}
-
 jacocoTestCoverageVerification {
   violationRules {
     rule {
@@ -36,4 +31,9 @@ jacocoTestCoverageVerification {
       }
     }
   }
+}
+
+test {
+  useJUnitPlatform()
+  finalizedBy jacocoTestReport
 }

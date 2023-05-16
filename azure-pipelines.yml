@@ -10,7 +10,7 @@ steps:
   inputs:
     workingDirectory: '$(System.DefaultWorkingDirectory)'
     gradleWrapperFile: 'gradlew'
-    codeCoverageToolOption: JaCoCo
+    codeCoverageToolOption: 'JaCoCo'
     tasks: 'build jacocoTestReport jacocoTestCoverageVerification'
     publishJUnitResults: true
     testResultsFiles: '**/TEST-*.xml'

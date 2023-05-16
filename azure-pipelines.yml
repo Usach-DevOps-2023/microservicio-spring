@@ -6,6 +6,17 @@ pool:
 
 steps:
 
+- task: Gradle@3
+  inputs:
+    gradleWrapperFile: 'gradlew'
+    tasks: 'build jacocoTestReport' #jacocoTestCoverageVerification
+    publishJUnitResults: true
+    testResultsFiles: '**/TEST-*.xml'
+    javaHomeOption: 'JDKVersion'
+    sonarQubeRunAnalysis: false
+    spotBugsAnalysis: false
+  displayName: Build/TestCoverage
+
 - task: SonarCloudPrepare@1
   inputs:
     SonarCloud: 'SonarCloud'
@@ -17,13 +28,13 @@ steps:
 - task: Gradle@3
   inputs:
     gradleWrapperFile: 'gradlew'
-    tasks: 'build jacocoTestReport' #jacocoTestCoverageVerification
-    publishJUnitResults: true
-    testResultsFiles: '**/TEST-*.xml'
+    tasks: 'sonarqube'
+    publishJUnitResults: false
     javaHomeOption: 'JDKVersion'
-    sonarQubeRunAnalysis: false
+    sonarQubeRunAnalysis: true
+    sqGradlePluginVersionChoice: 'specify'
+    sonarQubeGradlePluginVersion: '3.3'
     spotBugsAnalysis: false
-  displayName: Build/TestCoverage
 
 - task: PublishCodeCoverageResults@1
   inputs:

@@ -31,7 +31,6 @@ jacocoTestCoverageVerification {
       }
     }
   }
-  dependsOn jacocoTestReport
 }
 
 jacocoTestReport {

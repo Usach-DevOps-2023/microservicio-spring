@@ -43,12 +43,8 @@ jacocoTestReport {
         xml.enabled true
         html.enabled true
     }
-    classDirectories = files("${project.buildDir}/classes/java/main")
     sourceDirectories = files("${project.projectDir}/src/main/java")
     afterEvaluate {
-        classDirectories.from(classDirectories.files.collect {
-            fileTree(dir: it, exclude: '**/models/*') // exclude generated code
-        })
         sourceDirectories.from(sourceDirectories.files.collect {
             fileTree(dir: it, exclude: '**/models/*') // exclude generated code
         })

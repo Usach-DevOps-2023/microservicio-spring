@@ -38,13 +38,6 @@ jacocoTestCoverageVerification {
   }
 }
 
-jacocoTestReport {
-    reports {
-        xml.enabled true
-        html.enabled true
-    }
-}
-
 tasks.withType(Test) {
     jacoco.includeNoLocationClasses = true
 }

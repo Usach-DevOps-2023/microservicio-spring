@@ -21,7 +21,6 @@ dependencies {
 jacoco {
   toolVersion = "0.8.7"
   reportsDir = file("$buildDir/reports/jacoco")
-  destinationFile = file("$buildDir/jacoco/test.exec")
 }
 
 test {

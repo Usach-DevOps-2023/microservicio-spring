@@ -6,11 +6,17 @@ pool:
 
 steps:
 
+- task: SonarCloudPrepare@1
+  inputs:
+    SonarCloud: 'SonarCloud'
+    organization: 'usach-devops-2023'
+    projectKey: 'Usach-DevOps-2023_microservicio-spring'
+    projectName: 'microservicio-spring'
+  displayName: 'SonarCloud Prepare'
+
 - task: Gradle@3
   inputs:
-    #workingDirectory: '$(System.DefaultWorkingDirectory)'
     gradleWrapperFile: 'gradlew'
-    #codeCoverageToolOption: 'JaCoCo'
     tasks: 'build jacocoTestReport' #jacocoTestCoverageVerification
     publishJUnitResults: true
     testResultsFiles: '**/TEST-*.xml'

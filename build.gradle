@@ -25,6 +25,7 @@ jacoco {
 
 test {
   useJUnitPlatform()
+  finalizedBy jacocoTestReport
 }
 
 jacocoTestCoverageVerification {

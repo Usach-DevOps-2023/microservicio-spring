@@ -29,12 +29,12 @@ steps:
   inputs:
     gradleWrapperFile: 'gradlew'
     tasks: 'sonarqube'
-    publishJUnitResults: false
     javaHomeOption: 'JDKVersion'
     sonarQubeRunAnalysis: true
     sqGradlePluginVersionChoice: 'specify'
     sonarQubeGradlePluginVersion: '3.3'
     spotBugsAnalysis: false
+  displayName: 'SonarCloud'
 
 - task: PublishCodeCoverageResults@1
   inputs:

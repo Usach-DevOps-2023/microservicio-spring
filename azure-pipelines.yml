@@ -8,14 +8,26 @@ steps:
 
 - task: Gradle@3
   inputs:
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
     gradleWrapperFile: 'gradlew'
-    tasks: 'build'
+    tasks: 'build jacocoTestReport jacocoTestCoverageVerification'
     publishJUnitResults: true
     testResultsFiles: '**/TEST-*.xml'
     javaHomeOption: 'JDKVersion'
     sonarQubeRunAnalysis: false
     spotBugsAnalysis: false
-  displayName: Build
+  displayName: Build/TestCoverage
+
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: |
+      minimum_coverage=$(grep "minimum=" build.gradle | grep -o "[0-9]*\.[0-9]*")
+      coverage=$(grep "LINE" build/reports/jacoco/test/html/index.html | head -n1 | grep -o "[0-9]*\.[0-9]*")
+      if (( $(echo "$coverage < $minimum_coverage" |bc -l) )); then
+        echo "Code coverage ($coverage) is less than the required minimum ($minimum_coverage)"
+        exit 1
+      fi
 
 - task: Docker@2
   inputs:

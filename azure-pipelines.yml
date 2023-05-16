@@ -6,16 +6,15 @@ pool:
 
 steps:
 
-- task: Gradle@2
+- task: Gradle@3
   inputs:
     workingDirectory: '$(System.DefaultWorkingDirectory)'
-    tasks: 'clean build'
     gradleWrapperFile: 'gradlew'
+    codeCoverageToolOption: 'JaCoCo'
+    tasks: 'build jacocoTestReport jacocoTestCoverageVerification'
     publishJUnitResults: true
     testResultsFiles: '**/TEST-*.xml'
-    codeCoverageToolOption: 'jacoco'
-    codeCoverageClassFilesDirectories: 'build/classes/java/main'
-    #codeCoverageSourceDirectories: 'src/main/java'
-    #codeCoverageReportFiles: '**/jacoco.xml'
+    javaHomeOption: 'JDKVersion'
     sonarQubeRunAnalysis: false
-  displayName: 'Build with Gradle and run tests'
+    spotBugsAnalysis: false
+  displayName: Build/TestCoverage

@@ -6,47 +6,24 @@ pool:
 
 steps:
 
-- task: Gradle@3
+- task: Gradle@2
   inputs:
     workingDirectory: '$(System.DefaultWorkingDirectory)'
+    tasks: 'clean build'
     gradleWrapperFile: 'gradlew'
-    codeCoverageToolOption: 'JaCoCo'
-    tasks: 'build jacocoTestReport jacocoTestCoverageVerification'
     publishJUnitResults: true
     testResultsFiles: '**/TEST-*.xml'
-    javaHomeOption: 'JDKVersion'
+    codeCoverageToolOption: 'jacoco'
+    codeCoverageClassFilesDirectories: 'build/classes/java/main'
+    #codeCoverageSourceDirectories: 'src/main/java'
+    #codeCoverageReportFiles: '**/jacoco.xml'
     sonarQubeRunAnalysis: false
-    spotBugsAnalysis: false
-  displayName: Build/TestCoverage
+  displayName: 'Build with Gradle and run tests'
 
-- task: Bash@3
+- task: PublishCodeCoverageResults@1
   inputs:
-    targetType: 'inline'
-    script: |
-      minimum_coverage=$(grep "minimum=" build.gradle | grep -o "[0-9]*\.[0-9]*")
-      coverage=$(grep "LINE" build/reports/jacoco/test/html/index.html | head -n1 | grep -o "[0-9]*\.[0-9]*")
-      if (( $(echo "$coverage < $minimum_coverage" |bc -l) )); then
-        echo "Code coverage ($coverage) is less than the required minimum ($minimum_coverage)"
-        exit 1
-      fi
-
-- task: Docker@2
-  inputs:
-    containerRegistry: 'Docker'
-    command: 'login'
-  displayName: 'Docker Login'
-
-- task: Docker@2
-  inputs:
-    containerRegistry: 'Docker'
-    repository: 'rcortesz/microservicio-laboratory'
-    command: 'build'
-    Dockerfile: '**/Dockerfile'
-  displayName: 'Docker Build'
-
-- task: Docker@2
-  inputs:
-    containerRegistry: 'Docker'
-    repository: 'rcortesz/microservicio-laboratory'
-    command: 'push'
-  displayName: 'Docker Push'
+    codeCoverageTool: 'JaCoCo'
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/build/reports/jacoco/test/jacocoTestReport.xml'
+    reportDirectory: '$(System.DefaultWorkingDirectory)/build/reports/jacoco/test'
+    failIfCoverageEmpty: true
+  displayName: 'Publish code coverage results'

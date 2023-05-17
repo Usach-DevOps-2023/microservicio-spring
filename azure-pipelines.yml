@@ -35,6 +35,27 @@ steps:
     failIfCoverageEmpty: true
   displayName: 'Publish code coverage results'
 
+- task: Docker@2
+  inputs:
+    containerRegistry: 'Docker'
+    command: 'login'
+  displayName: 'Docker Login'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'Docker'
+    repository: 'rcortesz/microservicio-laboratory'
+    command: 'build'
+    Dockerfile: '**/Dockerfile'
+  displayName: 'Docker Build'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'Docker'
+    repository: 'rcortesz/microservicio-laboratory'
+    command: 'push'
+  displayName: 'Docker Push'
+
 - script: |
     wget -O apache-jmeter-5.4.3.tgz https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.4.3.tgz
     tar -xzf apache-jmeter-5.4.3.tgz
@@ -52,10 +73,9 @@ steps:
     testResultsFiles: '**/results.jtl'
 
 - script: |
-    echo "Folder: $(System.DefaultWorkingDirectory)"
     # Parse the JTL file and calculate the error percentage
-    totalRequests=$(grep -c "<httpSample" src/test/jmx/results.jtl)
-    errorRequests=$(grep -c "<httpSample.*s=\"false\"" src/test/jmx/results.jtl)
+    totalRequests=$(grep -c "<httpSample" $(System.DefaultWorkingDirectory)/src/test/jmx/results.jtl)
+    errorRequests=$(grep -c "<httpSample.*s=\"false\"" $(System.DefaultWorkingDirectory)/src/test/jmx/results.jtl)
     errorPercentage=$(awk "BEGIN {printf \"%.2f\", (${errorRequests}/${totalRequests})*100}")
 
     # Print the error percentage

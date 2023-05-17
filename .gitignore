@@ -1,0 +1,5 @@
+.gradle
+.metadata
+.vscode
+bin
+build

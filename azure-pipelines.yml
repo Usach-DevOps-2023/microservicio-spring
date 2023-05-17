@@ -34,3 +34,32 @@ steps:
     reportDirectory: 'build/reports/jacoco/test'
     failIfCoverageEmpty: true
   displayName: 'Publish code coverage results'
+
+- task: DownloadSecureFile@1
+  displayName: 'Download JMeter'
+  name: jmeterDownload
+  inputs:
+    secureFile: 'jmeter.zip'
+
+- task: ExtractFiles@1
+  displayName: 'Extract JMeter'
+  inputs:
+    archiveFilePatterns: '$(jmeterDownload.secureFilePath)'
+    destinationFolder: '$(Agent.TempDirectory)/jmeter'
+
+- task: PowerShell@2
+  displayName: 'Set JMeter Path'
+  inputs:
+    targetType: 'inline'
+    script: |
+      $env:JMETER_HOME = '$(Agent.TempDirectory)/jmeter/apache-jmeter-5.4.1'
+      $env:PATH += ";$env:JMETER_HOME/bin"
+- script: |
+    jmeter -n -t src/test/jmx/PerformanceTesting.jmx -l $(Build.ArtifactStagingDirectory)/results.jtl
+  displayName: 'Run JMeter Tests'
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results'
+  inputs:
+    testResultsFormat: 'JUnit'
+    testResultsFiles: '$(Build.ArtifactStagingDirectory)/results.jtl'
+    searchFolder: '$(Build.ArtifactStagingDirectory)'

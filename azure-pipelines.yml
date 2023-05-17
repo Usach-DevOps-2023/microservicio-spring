@@ -19,7 +19,7 @@ steps:
     gradleWrapperFile: 'gradlew'
     tasks: 'build jacocoTestReport' #jacocoTestCoverageVerification
     publishJUnitResults: true
-    testResultsFiles: '**/TEST-*.xml'
+    testResultsFiles: '**/*Test*.xml'
     javaHomeOption: 'JDKVersion'
     sonarQubeRunAnalysis: true
     sqGradlePluginVersionChoice: 'specify'
@@ -49,5 +49,4 @@ steps:
   displayName: 'Publish Test Results'
   inputs:
     testResultsFormat: 'JUnit'
-    testResultsFiles: 'src/test/jmx/results.jtl'
-    searchFolder: 'src/test/jmx'
+    testResultsFiles: '**/*.jtl'

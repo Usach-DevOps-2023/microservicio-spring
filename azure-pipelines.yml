@@ -36,13 +36,13 @@ steps:
   displayName: 'Publish code coverage results'
 
 - script: |
-    wget -O apache-jmeter-5.4.1.tgz https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.4.3.tgz
-    tar -xzf apache-jmeter-5.4.1.tgz
-    rm apache-jmeter-5.4.1.tgz
+    wget -O apache-jmeter-5.4.3.tgz https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.4.3.tgz
+    tar -xzf apache-jmeter-5.4.3.tgz
+    rm apache-jmeter-5.4.3.tgz
   displayName: 'Download JMeter'
 
 - script: |
-    ./apache-jmeter-5.4.1/bin/jmeter.sh -n -t src/test/jmx/PerformanceTesting.jmx -l src/test/jmx/results.jtl
+    ./apache-jmeter-5.4.3/bin/jmeter.sh -n -t src/test/jmx/PerformanceTesting.jmx -l src/test/jmx/results.jtl
   displayName: 'Run JMeter Tests'
 
 - task: PublishTestResults@2

@@ -71,7 +71,8 @@ steps:
   displayName: 'Publish JMeter Results'
   inputs:
     testResultsFormat: 'JUnit'
-    testResultsFiles: '**/results.xml'
+    searchFolder: 'src/test/xml'
+    testResultsFiles: 'results.xml'
 
 - script: |
     # Parse the JTL file and calculate the error percentage

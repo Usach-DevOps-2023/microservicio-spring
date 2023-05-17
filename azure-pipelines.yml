@@ -6,24 +6,6 @@ pool:
 
 steps:
 
-- task: Gradle@3
-  inputs:
-    gradleWrapperFile: 'gradlew'
-    tasks: 'build jacocoTestReport' #jacocoTestCoverageVerification
-    publishJUnitResults: true
-    testResultsFiles: '**/TEST-*.xml'
-    javaHomeOption: 'JDKVersion'
-    sonarQubeRunAnalysis: false
-    spotBugsAnalysis: false
-  displayName: Build/TestCoverage
-
-- task: Bash@3
-  inputs:
-    targetType: 'inline'
-    script: |
-      minimum_coverage=$(grep "minimum=" build.gradle | grep -o "[0-9]*\.[0-9]*")
-      echo "Code coverage ($coverage) is less than the required minimum ($minimum_coverage)"
-
 - task: SonarCloudPrepare@1
   inputs:
     SonarCloud: 'SonarCloud'
@@ -35,13 +17,15 @@ steps:
 - task: Gradle@3
   inputs:
     gradleWrapperFile: 'gradlew'
-    tasks: 'sonarqube'
+    tasks: 'build jacocoTestReport' #jacocoTestCoverageVerification
+    publishJUnitResults: true
+    testResultsFiles: '**/TEST-*.xml'
     javaHomeOption: 'JDKVersion'
     sonarQubeRunAnalysis: true
     sqGradlePluginVersionChoice: 'specify'
     sonarQubeGradlePluginVersion: '3.3'
     spotBugsAnalysis: false
-  displayName: 'SonarCloud'
+  displayName: Build
 
 - task: PublishCodeCoverageResults@1
   inputs:

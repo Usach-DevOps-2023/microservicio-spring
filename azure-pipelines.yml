@@ -46,7 +46,7 @@ steps:
   displayName: 'Run JMeter Tests'
 
 - script: |
-    ./apache-jmeter-5.4.3/bin/jmeter.sh -g src/test/jmx/results.jtl -e -o src/test/jmx -Jjmeter.save.saveservice.output_format=xml
+    ./apache-jmeter-5.4.3/bin/jmeter.sh -g src/test/jmx/results.jtl -e -o src/test/jmx -Jjmeter.save.saveservice.output_format=xml -f
   displayName: 'Convert JTL to XML'
 
 - task: PublishTestResults@2

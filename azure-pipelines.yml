@@ -64,15 +64,15 @@ steps:
   displayName: 'Download JMeter'
 
 - script: |
-    ./apache-jmeter-5.4.3/bin/jmeter.sh -n -t src/test/jmx/PerformanceTesting.jmx -l src/test/jmx/results.jtl -e -o src/test/xml/results.xml -f
+    ./apache-jmeter-5.4.3/bin/jmeter.sh -n -t src/test/jmx/PerformanceTesting.jmx -l src/test/jmx/results.jtl -e -o src/test/jmx -f
   displayName: 'Run JMeter Tests'
 
 - task: PublishTestResults@2
   displayName: 'Publish JMeter Results'
   inputs:
     testResultsFormat: 'JUnit'
-    searchFolder: 'src/test/xml'
-    testResultsFiles: 'results.xml'
+    searchFolder: 'src/test/jmx'
+    testResultsFiles: 'results.jtl'
 
 - script: |
     # Parse the JTL file and calculate the error percentage

@@ -53,8 +53,8 @@ steps:
 
 - script: |
     # Parse the JTL file and calculate the error percentage
-    totalRequests=$(grep -c "<httpSample" src/test/jmx/results.jtl)
-    errorRequests=$(grep -c "<httpSample.*s=\"false\"" src/test/jmx/results.jtl)
+    totalRequests=$(grep -c "<httpSample" **/results.jtl)
+    errorRequests=$(grep -c "<httpSample.*s=\"false\"" **/results.jtl)
     errorPercentage=$(awk "BEGIN {printf \"%.2f\", (${errorRequests}/${totalRequests})*100}")
 
     # Print the error percentage

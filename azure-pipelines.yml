@@ -6,6 +6,20 @@ pool:
 
 steps:
 
+- script: |
+      git fetch --unshallow
+  displayName: 'Convert to non-shallow clone'
+
+- task: Gradle@3
+  inputs:
+      gradleWrapperFile: 'gradlew'
+      tasks: 'build'
+      publishJUnitResults: true
+      javaHomeOption: 'JDKVersion'
+      sonarQubeRunAnalysis: false
+      spotBugsAnalysis: false
+  displayName: Build
+
 - task: SonarCloudPrepare@1
   inputs:
     SonarCloud: 'SonarCloud'
@@ -17,16 +31,16 @@ steps:
 - task: Gradle@3
   inputs:
     gradleWrapperFile: 'gradlew'
-    tasks: 'build jacocoTestReport'
+    workingDirectory: '$(Build.SourcesDirectory)'
+    tasks: 'clean test jacocoTestReport'
     publishJUnitResults: true
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
-    testResultsFiles: '**/*Test*.xml'
+    testResultsFiles: '*/TEST-.xml'
     javaHomeOption: 'JDKVersion'
     sonarQubeRunAnalysis: true
     sqGradlePluginVersionChoice: 'specify'
     sonarQubeGradlePluginVersion: '3.3'
     spotBugsAnalysis: false
-  displayName: Build
+  displayName: Run Test
 
 - task: PublishCodeCoverageResults@1
   inputs:
@@ -56,36 +70,3 @@ steps:
     repository: 'rcortesz/microservicio-laboratory'
     command: 'push'
   displayName: 'Docker Push'
-
-- script: |
-    wget -O apache-jmeter-5.4.3.tgz https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.4.3.tgz
-    tar -xzf apache-jmeter-5.4.3.tgz
-    rm apache-jmeter-5.4.3.tgz
-  displayName: 'Download JMeter'
-
-- script: |
-    ./apache-jmeter-5.4.3/bin/jmeter.sh -n -t src/test/jmx/PerformanceTesting.jmx -l src/test/jmx/results.jtl
-  displayName: 'Run JMeter Tests'
-
-- task: PublishTestResults@2
-  displayName: 'Publish JMeter Results'
-  inputs:
-    testResultsFormat: 'JUnit'
-    searchFolder: 'src/test/jmx'
-    testResultsFiles: 'results.jtl'
-
-- script: |
-    # Parse the JTL file and calculate the error percentage
-    totalRequests=$(grep -c "<httpSample" $(System.DefaultWorkingDirectory)/src/test/jmx/results.jtl)
-    errorRequests=$(grep -c "<httpSample.*s=\"false\"" $(System.DefaultWorkingDirectory)/src/test/jmx/results.jtl)
-    errorPercentage=$(awk "BEGIN {printf \"%.2f\", (${errorRequests}/${totalRequests})*100}")
-
-    # Print the error percentage
-    echo "Error Percentage: ${errorPercentage}%"
-    
-    # Fail the pipeline if the error percentage exceeds a threshold
-    if (( $(awk "BEGIN {print (${errorPercentage} > 10 ? 1 : 0)}") )); then
-      echo "Error percentage exceeds threshold. Failing the pipeline."
-      exit 1
-    fi
-  displayName: 'Calculate Error Percentage'

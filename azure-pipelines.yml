@@ -42,11 +42,27 @@ steps:
   displayName: 'Download JMeter'
 
 - script: |
-    ./apache-jmeter-5.4.3/bin/jmeter.sh -n -t src/test/jmx/PerformanceTesting.jmx -l src/test/jmx/results.csv
+    ./apache-jmeter-5.4.3/bin/jmeter.sh -n -t src/test/jmx/PerformanceTesting.jmx -l src/test/jmx/results.jtl
   displayName: 'Run JMeter Tests'
 
 - task: PublishTestResults@2
   displayName: 'Publish Test Results'
   inputs:
     testResultsFormat: 'JUnit'
-    testResultsFiles: '**/results.csv'
+    testResultsFiles: '**/results.jtl'
+
+- script: |
+    # Parse the JTL file and calculate the error percentage
+    totalRequests=$(grep -c "<httpSample" src/test/jmx/results.jtl)
+    errorRequests=$(grep -c "<httpSample.*s=\"false\"" src/test/jmx/results.jtl)
+    errorPercentage=$(awk "BEGIN {printf \"%.2f\", (${errorRequests}/${totalRequests})*100}")
+
+    # Print the error percentage
+    echo "Error Percentage: ${errorPercentage}%"
+    
+    # Fail the pipeline if the error percentage exceeds a threshold
+    if (( $(awk "BEGIN {print (${errorPercentage} > 10 ? 1 : 0)}") )); then
+      echo "Error percentage exceeds threshold. Failing the pipeline."
+      exit 1
+    fi
+  displayName: 'Calculate Error Percentage'

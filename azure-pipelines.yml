@@ -35,31 +35,19 @@ steps:
     failIfCoverageEmpty: true
   displayName: 'Publish code coverage results'
 
-- task: DownloadSecureFile@1
-  displayName: 'Download JMeter'
-  name: jmeterDownload
-  inputs:
-    secureFile: 'jmeter.zip'
-
-- task: ExtractFiles@1
-  displayName: 'Extract JMeter'
-  inputs:
-    archiveFilePatterns: '$(jmeterDownload.secureFilePath)'
-    destinationFolder: '$(Agent.TempDirectory)/jmeter'
-
-- task: PowerShell@2
-  displayName: 'Set JMeter Path'
-  inputs:
-    targetType: 'inline'
-    script: |
-      $env:JMETER_HOME = '$(Agent.TempDirectory)/jmeter/apache-jmeter-5.4.1'
-      $env:PATH += ";$env:JMETER_HOME/bin"
 - script: |
-    jmeter -n -t src/test/jmx/PerformanceTesting.jmx -l $(Build.ArtifactStagingDirectory)/results.jtl
+    wget -O apache-jmeter-5.4.1.tgz https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.4.1.tgz
+    tar -xzf apache-jmeter-5.4.1.tgz
+    rm apache-jmeter-5.4.1.tgz
+  displayName: 'Download JMeter'
+
+- script: |
+    ./apache-jmeter-5.4.1/bin/jmeter.sh -n -t src/test/jmx/PerformanceTesting.jmx -l src/test/jmx/results.jtl
   displayName: 'Run JMeter Tests'
+
 - task: PublishTestResults@2
   displayName: 'Publish Test Results'
   inputs:
     testResultsFormat: 'JUnit'
-    testResultsFiles: '$(Build.ArtifactStagingDirectory)/results.jtl'
-    searchFolder: '$(Build.ArtifactStagingDirectory)'
+    testResultsFiles: 'src/test/jmx/results.jtl'
+    searchFolder: 'src/test/jmx'

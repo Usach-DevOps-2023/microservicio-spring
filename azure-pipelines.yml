@@ -42,12 +42,8 @@ steps:
   displayName: 'Download JMeter'
 
 - script: |
-    ./apache-jmeter-5.4.3/bin/jmeter.sh -n -t src/test/jmx/PerformanceTesting.jmx -l src/test/jmx/results.jtl
+    ./apache-jmeter-5.4.3/bin/jmeter.sh -n -t src/test/jmx/PerformanceTesting.jmx -l src/test/jmx/results.csv
   displayName: 'Run JMeter Tests'
-
-- script: |
-    ./apache-jmeter-5.4.3/bin/jmeter.sh -g src/test/jmx/results.jtl -e -o src/test/jmx -Jjmeter.save.saveservice.output_format=csv -f
-  displayName: 'Convert JTL to XML'
 
 - task: PublishTestResults@2
   displayName: 'Publish Test Results'

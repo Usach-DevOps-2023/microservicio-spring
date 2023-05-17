@@ -17,6 +17,13 @@ steps:
     spotBugsAnalysis: false
   displayName: Build/TestCoverage
 
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: |
+      minimum_coverage=$(grep "minimum=" build.gradle | grep -o "[0-9]*\.[0-9]*")
+      echo "Code coverage ($coverage) is less than the required minimum ($minimum_coverage)"
+
 - task: SonarCloudPrepare@1
   inputs:
     SonarCloud: 'SonarCloud'

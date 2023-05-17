@@ -19,6 +19,7 @@ steps:
     gradleWrapperFile: 'gradlew'
     tasks: 'build jacocoTestReport' #jacocoTestCoverageVerification
     publishJUnitResults: true
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
     testResultsFiles: '**/*Test*.xml'
     javaHomeOption: 'JDKVersion'
     sonarQubeRunAnalysis: true

@@ -17,7 +17,7 @@ steps:
 - task: Gradle@3
   inputs:
     gradleWrapperFile: 'gradlew'
-    tasks: 'build jacocoTestReport' #jacocoTestCoverageVerification
+    tasks: 'build jacocoTestReport'
     publishJUnitResults: true
     workingDirectory: '$(System.DefaultWorkingDirectory)'
     testResultsFiles: '**/*Test*.xml'
@@ -64,11 +64,11 @@ steps:
   displayName: 'Download JMeter'
 
 - script: |
-    ./apache-jmeter-5.4.3/bin/jmeter.sh -n -t src/test/jmx/PerformanceTesting.jmx -l src/test/jmx/results.jtl
+    ./apache-jmeter-5.4.3/bin/jmeter.sh -n -t src/test/jmx/PerformanceTesting.jmx -l src/test/jmx/results.jtl -e -o src/test/jmx -f
   displayName: 'Run JMeter Tests'
 
 - task: PublishTestResults@2
-  displayName: 'Publish Test Results'
+  displayName: 'Publish JMeter Results'
   inputs:
     testResultsFormat: 'JUnit'
     testResultsFiles: '**/results.jtl'

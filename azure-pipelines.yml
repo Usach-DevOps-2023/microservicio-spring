@@ -103,12 +103,18 @@ jobs:
         command: 'login'
       displayName: 'Docker Login'
     
-    - task: CmdLine@2
-      displayName: 'Run Docker Image'
-      inputs:
-        script: |
-          docker run --rm -p 8080:8080 --name microservicespring rcortesz/microservicio-laboratory:128
+    #- task: CmdLine@2
+    #  displayName: 'Run Docker Image'
+    #  inputs:
+    #    script: |
+    #      docker run --rm -p 8080:8080 --name microservicespring rcortesz/microservicio-laboratory:128
+
+  - job:
+  
+    pool: 'default'
     
+    steps:
+
     - script: |
         echo "$(Agent.TempDirectory)/jmeter/apache-jmeter-5.5.zip"
         #sourceUrl: 'https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.5.zip'

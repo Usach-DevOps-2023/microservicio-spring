@@ -90,3 +90,27 @@ jobs:
         repository: 'rcortesz/microservicio-laboratory'
         command: 'push'
       displayName: 'Docker Push'
+
+  - job:
+  
+    pool: 'default'
+    
+    steps:
+    
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Docker'
+        command: 'login'
+      displayName: 'Docker Login'
+    
+    - task: CmdLine@2
+      displayName: 'Run Docker Image'
+      inputs:
+        script: |
+          docker run --rm -p 8080:8080 --name microservicespring rcortesz/microservicio-laboratory:128
+    
+    - script: |
+        echo "$(Agent.TempDirectory)/jmeter/apache-jmeter-5.5.zip"
+        #sourceUrl: 'https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.5.zip'
+        #targetPath: '$(Agent.TempDirectory)/jmeter/apache-jmeter-5.5.zip'
+      displayName: 'Download JMeter Distribution'

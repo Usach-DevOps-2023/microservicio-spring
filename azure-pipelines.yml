@@ -1,74 +1,125 @@
 trigger:
-- feature-ms-rodrigoCortes-mensaje
+  - feature-ms-rodrigoCortes-mensaje
 
-pool:
-  vmImage: ubuntu-latest
+jobs:
+  - job:
 
-steps:
+    pool:
+      vmImage: ubuntu-latest
 
-- script: |
-      git fetch --unshallow
-  displayName: 'Convert to non-shallow Clone'
+    steps:
 
-- task: Gradle@3
-  inputs:
-      gradleWrapperFile: 'gradlew'
-      workingDirectory: '$(Build.SourcesDirectory)'
-      tasks: 'build test jacocoTestReport'
-      publishJUnitResults: true
-      testResultsFiles: '**/TEST-*.xml'
-      javaHomeOption: 'JDKVersion'
-      sonarQubeRunAnalysis: false
-      spotBugsAnalysis: false
-  displayName: Build
+    - script: |
+        git fetch --unshallow
+      displayName: 'Convert to non-shallow Clone'
 
-- task: SonarCloudPrepare@1
-  inputs:
-    SonarCloud: 'SonarCloud'
-    organization: 'usach-devops-2023'
-    projectKey: 'Usach-DevOps-2023_microservicio-spring'
-    projectName: 'microservicio-spring'
-  displayName: 'SonarCloud Prepare'
+    - task: Gradle@3
+      inputs:
+          gradleWrapperFile: 'gradlew'
+          workingDirectory: '$(Build.SourcesDirectory)'
+          tasks: 'build test jacocoTestReport'
+          publishJUnitResults: true
+          testResultsFiles: '**/TEST-*.xml'
+          javaHomeOption: 'JDKVersion'
+          sonarQubeRunAnalysis: false
+          spotBugsAnalysis: false
+      displayName: Build
 
-- task: Gradle@3
-  inputs:
-    gradleWrapperFile: 'gradlew'
-    workingDirectory: '$(Build.SourcesDirectory)'
-    tasks: 'sonarqube'
-    publishJUnitResults: false
-    javaHomeOption: 'JDKVersion'
-    sonarQubeRunAnalysis: true
-    sqGradlePluginVersionChoice: 'specify'
-    sonarQubeGradlePluginVersion: '3.3'
-    spotBugsAnalysis: false
-  displayName: Run SonarCloud
+    - task: SonarCloudPrepare@1
+      inputs:
+        SonarCloud: 'SonarCloud'
+        organization: 'usach-devops-2023'
+        projectKey: 'Usach-DevOps-2023_microservicio-spring'
+        projectName: 'microservicio-spring'
+      displayName: 'SonarCloud Prepare'
 
-- task: PublishCodeCoverageResults@1
-  inputs:
-    codeCoverageTool: 'JaCoCo'
-    summaryFileLocation: '$(System.DefaultWorkingDirectory)/build/reports/jacoco/test/jacocoTestReport.xml'
-    pathToSources: '$(System.DefaultWorkingDirectory)/src/main/java/'
-    reportDirectory: '$(System.DefaultWorkingDirectory)/build/reports/jacoco/test'
-    failIfCoverageEmpty: true
-  displayName: 'Publish Code Coverage Results'
+    - task: Gradle@3
+      inputs:
+        gradleWrapperFile: 'gradlew'
+        workingDirectory: '$(Build.SourcesDirectory)'
+        tasks: 'sonarqube'
+        publishJUnitResults: false
+        javaHomeOption: 'JDKVersion'
+        sonarQubeRunAnalysis: true
+        sqGradlePluginVersionChoice: 'specify'
+        sonarQubeGradlePluginVersion: '3.3'
+        spotBugsAnalysis: false
+      displayName: Run SonarCloud
 
-- task: Docker@2
-  inputs:
-    containerRegistry: 'Docker'
-    command: 'login'
-  displayName: 'Docker Login'
+    - task: PublishCodeCoverageResults@1
+      inputs:
+        codeCoverageTool: 'JaCoCo'
+        summaryFileLocation: '$(System.DefaultWorkingDirectory)/build/reports/jacoco/test/jacocoTestReport.xml'
+        pathToSources: '$(System.DefaultWorkingDirectory)/src/main/java/'
+        reportDirectory: '$(System.DefaultWorkingDirectory)/build/reports/jacoco/test'
+        failIfCoverageEmpty: true
+      displayName: 'Publish Code Coverage Results'
 
-- task: Docker@2
-  inputs:
-    containerRegistry: 'Docker'
-    repository: 'rcortesz/microservicio-laboratory'
-    command: 'build'
-    Dockerfile: '**/Dockerfile'
-  displayName: 'Docker Build'
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Docker'
+        command: 'login'
+      displayName: 'Docker Login'
 
-- task: Docker@2
-  inputs:
-    containerRegistry: 'Docker'
-    repository: 'rcortesz/microservicio-laboratory'
-    command: 'push'
-  displayName: 'Docker Push'
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Docker'
+        repository: 'rcortesz/microservicio-laboratory'
+        command: 'build'
+        Dockerfile: '**/Dockerfile'
+      displayName: 'Docker Build'
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Docker'
+        repository: 'rcortesz/microservicio-laboratory'
+        command: 'push'
+      displayName: 'Docker Push'
+
+  - job:
+  
+    pool: 'default'
+    
+    steps:
+    
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'None'
+        command: 'create'
+        arguments: 'deployment microservicespring --image=rcortesz/microservicio-laboratory:latest'
+        secretType: 'dockerRegistry'
+        containerRegistryType: 'Azure Container Registry'
+      displayName: Deploy
+    
+    - script: |
+        wget -O apache-jmeter-5.4.3.tgz https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.4.3.tgz
+        tar -xzf apache-jmeter-5.4.3.tgz
+        rm apache-jmeter-5.4.3.tgz
+      displayName: 'Download JMeter'
+
+    - script: |
+        ./apache-jmeter-5.4.3/bin/jmeter.sh -n -t src/test/jmx/PerformanceTesting.jmx -l src/test/jmx/results.jtl
+      displayName: 'Run JMeter Tests'
+
+    - task: PublishTestResults@2
+      displayName: 'Publish JMeter Results'
+      inputs:
+        testResultsFormat: 'JUnit'
+        searchFolder: 'src/test/jmx'
+        testResultsFiles: 'results.jtl'
+
+    - script: |
+        # Parse the JTL file and calculate the error percentage
+        totalRequests=$(grep -c "<httpSample" $(System.DefaultWorkingDirectory)/src/test/jmx/results.jtl)
+        errorRequests=$(grep -c "<httpSample.*s=\"false\"" $(System.DefaultWorkingDirectory)/src/test/jmx/results.jtl)
+        errorPercentage=$(awk "BEGIN {printf \"%.2f\", (${errorRequests}/${totalRequests})*100}")
+
+        # Print the error percentage
+        echo "Error Percentage: ${errorPercentage}%"
+        
+        # Fail the pipeline if the error percentage exceeds a threshold
+        if (( $(awk "BEGIN {print (${errorPercentage} > 10 ? 1 : 0)}") )); then
+          echo "Error percentage exceeds threshold. Failing the pipeline."
+          exit 1
+        fi
+      displayName: 'Calculate Error Percentage'

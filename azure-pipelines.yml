@@ -3,6 +3,7 @@ trigger:
 
 jobs:
   - job: JOB1
+    dependsOn: JOB3
     pool:
       vmImage: ubuntu-latest
 
@@ -90,7 +91,7 @@ jobs:
         command: 'push'
       displayName: 'Docker Push'
 
-  - job:
+  - job: JOB2
     dependsOn: JOB1
 
     pool: 'default'
@@ -119,7 +120,7 @@ jobs:
     - task: PowerShell@2
       inputs:
         targetType: 'inline'
-        script: 'Invoke-WebRequest -Uri "https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.5.zip -OutFile $(Agent.TempDirectory)'
+        script: 'Invoke-WebRequest -Uri "https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.5.zip" -OutFile $(Agent.TempDirectory)'
       displayName: 'Download JMeter Distribution'
 
     - task: ExtractFiles@1

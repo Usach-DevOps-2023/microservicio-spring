@@ -82,6 +82,12 @@ jobs:
     
     steps:
     
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'Docker'
+        command: 'login'
+      displayName: 'Docker Login'
+    
     - task: Kubernetes@1
       inputs:
         connectionType: 'None'

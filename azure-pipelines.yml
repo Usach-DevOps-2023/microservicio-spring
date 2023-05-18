@@ -111,7 +111,7 @@ jobs:
     #      docker run --rm -p 8080:8080 --name microservicespring rcortesz/microservicio-laboratory:128
 
   - job: JOB3
-    dependsOn: JOB2
+    #dependsOn: JOB2
 
     pool: 'default'
     

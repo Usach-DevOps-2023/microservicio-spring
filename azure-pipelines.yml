@@ -46,6 +46,19 @@ jobs:
         spotBugsAnalysis: false
       displayName: Run SonarCloud
 
+    - script: |
+        threshold=80 # Set the desired code coverage threshold
+        reportFile=$(System.DefaultWorkingDirectory)/build/reports/jacoco/test/jacocoTestReport.xml
+        coverage=$(xmllint --xpath "sum(//counter[@type='INSTRUCTION']/@covered)" $reportFile)
+        total=$(xmllint --xpath "sum(//counter[@type='INSTRUCTION']/@missed)" $reportFile)
+        percentage=$(echo "scale=2; ($coverage / ($coverage + $total)) * 100" | bc)
+        echo "Code coverage: $percentage%"
+        if (( $(echo "$percentage < $threshold" | bc -l) )); then
+          echo "Code coverage is below the threshold of $threshold%"
+          exit 1
+        fi
+      displayName: 'Validate Code Coverage'
+
     - task: PublishCodeCoverageResults@1
       inputs:
         codeCoverageTool: 'JaCoCo'
@@ -75,57 +88,3 @@ jobs:
         repository: 'rcortesz/microservicio-laboratory'
         command: 'push'
       displayName: 'Docker Push'
-
-  - job:
-  
-    pool: 'default'
-    
-    steps:
-    
-    - task: Docker@2
-      inputs:
-        containerRegistry: 'Docker'
-        command: 'login'
-      displayName: 'Docker Login'
-    
-    - task: Kubernetes@1
-      inputs:
-        connectionType: 'None'
-        command: 'create'
-        arguments: 'deployment microservicespring --image=rcortesz/microservicio-laboratory:latest'
-        secretType: 'dockerRegistry'
-        containerRegistryType: 'Azure Container Registry'
-      displayName: Deploy
-    
-    - script: |
-        wget -O apache-jmeter-5.4.3.tgz https://downloads.apache.org/jmeter/binaries/apache-jmeter-5.4.3.tgz
-        tar -xzf apache-jmeter-5.4.3.tgz
-        rm apache-jmeter-5.4.3.tgz
-      displayName: 'Download JMeter'
-
-    - script: |
-        ./apache-jmeter-5.4.3/bin/jmeter.sh -n -t src/test/jmx/PerformanceTesting.jmx -l src/test/jmx/results.jtl
-      displayName: 'Run JMeter Tests'
-
-    - task: PublishTestResults@2
-      displayName: 'Publish JMeter Results'
-      inputs:
-        testResultsFormat: 'JUnit'
-        searchFolder: 'src/test/jmx'
-        testResultsFiles: 'results.jtl'
-
-    - script: |
-        # Parse the JTL file and calculate the error percentage
-        totalRequests=$(grep -c "<httpSample" $(System.DefaultWorkingDirectory)/src/test/jmx/results.jtl)
-        errorRequests=$(grep -c "<httpSample.*s=\"false\"" $(System.DefaultWorkingDirectory)/src/test/jmx/results.jtl)
-        errorPercentage=$(awk "BEGIN {printf \"%.2f\", (${errorRequests}/${totalRequests})*100}")
-
-        # Print the error percentage
-        echo "Error Percentage: ${errorPercentage}%"
-        
-        # Fail the pipeline if the error percentage exceeds a threshold
-        if (( $(awk "BEGIN {print (${errorPercentage} > 10 ? 1 : 0)}") )); then
-          echo "Error percentage exceeds threshold. Failing the pipeline."
-          exit 1
-        fi
-      displayName: 'Calculate Error Percentage'

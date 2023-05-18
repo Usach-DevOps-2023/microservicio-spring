@@ -25,27 +25,6 @@ jobs:
           spotBugsAnalysis: false
       displayName: Build
 
-    - task: SonarCloudPrepare@1
-      inputs:
-        SonarCloud: 'SonarCloud'
-        organization: 'usach-devops-2023'
-        projectKey: 'Usach-DevOps-2023_microservicio-spring'
-        projectName: 'microservicio-spring'
-      displayName: 'SonarCloud Prepare'
-
-    - task: Gradle@3
-      inputs:
-        gradleWrapperFile: 'gradlew'
-        workingDirectory: '$(Build.SourcesDirectory)'
-        tasks: 'sonarqube'
-        publishJUnitResults: false
-        javaHomeOption: 'JDKVersion'
-        sonarQubeRunAnalysis: true
-        sqGradlePluginVersionChoice: 'specify'
-        sonarQubeGradlePluginVersion: '3.3'
-        spotBugsAnalysis: false
-      displayName: Run SonarCloud
-
     - script: |
         sudo apt-get update
         sudo apt-get install -y libxml2-utils
@@ -69,6 +48,27 @@ jobs:
         reportDirectory: '$(System.DefaultWorkingDirectory)/build/reports/jacoco/test'
         failIfCoverageEmpty: true
       displayName: 'Publish Code Coverage Results'
+
+    - task: SonarCloudPrepare@1
+      inputs:
+        SonarCloud: 'SonarCloud'
+        organization: 'usach-devops-2023'
+        projectKey: 'Usach-DevOps-2023_microservicio-spring'
+        projectName: 'microservicio-spring'
+      displayName: 'SonarCloud Prepare'
+
+    - task: Gradle@3
+      inputs:
+        gradleWrapperFile: 'gradlew'
+        workingDirectory: '$(Build.SourcesDirectory)'
+        tasks: 'sonarqube'
+        publishJUnitResults: false
+        javaHomeOption: 'JDKVersion'
+        sonarQubeRunAnalysis: true
+        sqGradlePluginVersionChoice: 'specify'
+        sonarQubeGradlePluginVersion: '3.3'
+        spotBugsAnalysis: false
+      displayName: Run SonarCloud
 
     - task: Docker@2
       inputs:

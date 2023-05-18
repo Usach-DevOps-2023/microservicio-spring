@@ -115,8 +115,26 @@ jobs:
     
     steps:
 
-    - script: |
-        echo "$(Agent.TempDirectory)/jmeter/apache-jmeter-5.5.zip"
-        #sourceUrl: 'https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.5.zip'
-        #targetPath: '$(Agent.TempDirectory)/jmeter/apache-jmeter-5.5.zip'
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: '$WebClient.DownloadFile("https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.5.zip","$(Agent.TempDirectory)")'
       displayName: 'Download JMeter Distribution'
+
+    - task: ExtractFiles@1
+      displayName: 'Extract JMeter'
+      inputs:
+        archiveFilePatterns: '$(Agent.TempDirectory)/apache-jmeter-5.5.zip'
+        destinationFolder: '$(Agent.TempDirectory)/jmeter'
+
+    - task: PowerShell@2
+      displayName: 'Set JMeter Path'
+      inputs:
+        targetType: 'inline'
+        script: |
+          $env:JMETER_HOME = '$(Agent.TempDirectory)\jmeter\apache-jmeter-5.5'
+          $env:PATH += ";$env:JMETER_HOME\bin"
+
+    - script: |
+        jmeter -n -t $(Agent.TempDirectory)/jmeter/test/PerformanceTesting.jmx -l $(Agent.TempDirectory)/jmeter/result/results.jtl
+      displayName: 'Run JMeter Tests'

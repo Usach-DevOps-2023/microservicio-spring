@@ -47,7 +47,9 @@ jobs:
       displayName: Run SonarCloud
 
     - script: |
-        threshold=80 # Set the desired code coverage threshold
+        sudo apt-get update
+        sudo apt-get install -y libxml2-utils
+        threshold=85  # Set the desired code coverage threshold
         reportFile=$(System.DefaultWorkingDirectory)/build/reports/jacoco/test/jacocoTestReport.xml
         coverage=$(xmllint --xpath "sum(//counter[@type='INSTRUCTION']/@covered)" $reportFile)
         total=$(xmllint --xpath "sum(//counter[@type='INSTRUCTION']/@missed)" $reportFile)

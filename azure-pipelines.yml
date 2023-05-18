@@ -120,23 +120,23 @@ jobs:
     - task: PowerShell@2
       inputs:
         targetType: 'inline'
-        script: 'Invoke-WebRequest -Uri "https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.5.zip" -OutFile $(Agent.DefaultWorkingDirectory)'
+        script: 'Invoke-WebRequest -Uri "https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.5.zip" -OutFile $(Agent.HomeDirectory)'
       displayName: 'Download JMeter Distribution'
 
     - task: ExtractFiles@1
       displayName: 'Extract JMeter'
       inputs:
-        archiveFilePatterns: '$(Agent.DefaultWorkingDirectory)/apache-jmeter-5.5.zip'
-        destinationFolder: '$(Agent.DefaultWorkingDirectory)/jmeter'
+        archiveFilePatterns: '$(Agent.HomeDirectory)/apache-jmeter-5.5.zip'
+        destinationFolder: '$(Agent.HomeDirectory)/jmeter'
 
     - task: PowerShell@2
       displayName: 'Set JMeter Path'
       inputs:
         targetType: 'inline'
         script: |
-          $env:JMETER_HOME = '$(Agent.DefaultWorkingDirectory)\jmeter\apache-jmeter-5.5'
+          $env:JMETER_HOME = '$(Agent.HomeDirectory)\jmeter\apache-jmeter-5.5'
           $env:PATH += ";$env:JMETER_HOME\bin"
 
     - script: |
-        jmeter -n -t $(Agent.DefaultWorkingDirectory)/jmeter/test/PerformanceTesting.jmx -l $(Agent.DefaultWorkingDirectory)/jmeter/result/results.jtl
+        jmeter -n -t $(Agent.HomeDirectory)/jmeter/test/PerformanceTesting.jmx -l $(Agent.HomeDirectory)/jmeter/result/results.jtl
       displayName: 'Run JMeter Tests'

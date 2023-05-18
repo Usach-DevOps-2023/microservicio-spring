@@ -126,5 +126,5 @@ jobs:
           $env:PATH += ";$env:JMETER_HOME\bin"
 
     - script: |
-        jmeter -n -t $(Agent.HomeDirectory)/jmeter/test/PerformanceTesting.jmx -l $(Agent.HomeDirectory)/jmeter/result/results.jtl
+        jmeter.sh -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl
       displayName: 'Run JMeter Tests'

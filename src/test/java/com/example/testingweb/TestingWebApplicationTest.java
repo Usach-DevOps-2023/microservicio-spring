@@ -19,6 +19,11 @@ public class TestingWebApplicationTest {
 
 	@Autowired
 	private MockMvc mockMvc;
+	
+	@Test
+	public void main() {
+		TestingWebApplication.main(new String[] {});
+	}
 
 	@Test
 	public void shouldReturnDefaultMessage() throws Exception {

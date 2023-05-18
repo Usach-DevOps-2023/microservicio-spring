@@ -2,8 +2,7 @@ trigger:
   - feature-ms-rodrigoCortes-mensaje
 
 jobs:
-  - job:
-
+  - job: JOB1
     pool:
       vmImage: ubuntu-latest
 
@@ -92,7 +91,8 @@ jobs:
       displayName: 'Docker Push'
 
   - job:
-  
+    dependsOn: JOB1
+
     pool: 'default'
     
     steps:
@@ -109,8 +109,9 @@ jobs:
     #    script: |
     #      docker run --rm -p 8080:8080 --name microservicespring rcortesz/microservicio-laboratory:128
 
-  - job:
-  
+  - job: JOB3
+    dependsOn: JOB2
+
     pool: 'default'
     
     steps:
@@ -118,7 +119,7 @@ jobs:
     - task: PowerShell@2
       inputs:
         targetType: 'inline'
-        script: '$WebClient.DownloadFile("https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.5.zip","$(Agent.TempDirectory)")'
+        script: 'Invoke-WebRequest -Uri "https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.5.zip -OutFile $(Agent.TempDirectory)'
       displayName: 'Download JMeter Distribution'
 
     - task: ExtractFiles@1

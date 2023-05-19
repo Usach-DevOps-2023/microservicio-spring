@@ -92,7 +92,7 @@ jobs:
       displayName: 'Docker Push'
 
   - job: JOB2
-    dependsOn: JOB1
+    #dependsOn: JOB1
 
     pool: 'default'
     

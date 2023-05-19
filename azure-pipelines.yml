@@ -116,11 +116,11 @@ jobs:
     - task: PowerShell@2
       inputs:
         targetType: 'inline'
-        script: 'Start-Sleep -s 20'
+        script: 'Start-Sleep -s 10'
       displayName: 'Sleep'
 
   - job: JOB3
-    dependsOn: JOB2
+    dependsOn: JOB1
 
     pool: 'default'
     
@@ -141,14 +141,8 @@ jobs:
     - task: PowerShell@2
       inputs:
         targetType: 'inline'
-        script: 'Start-Sleep -s 20'
+        script: 'Start-Sleep -s 10'
       displayName: 'Sleep'
-
-    - task: PowerShell@2
-      displayName: 'Set JMeter Path'
-      inputs:
-        targetType: 'inline'
-        script: ''
 
     - task: CmdLine@2
       inputs:

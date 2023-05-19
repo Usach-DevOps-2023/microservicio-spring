@@ -136,7 +136,7 @@ jobs:
     #    script: 'kubectl port-forward deploy/microservicespring 8080:8080'
     #  displayName: 'Running Forward'
     
-    timeoutInMinutes: 0.6
+    timeoutInMinutes: 1
 
   - job: JOB4
     displayName: '4: Performance Test'

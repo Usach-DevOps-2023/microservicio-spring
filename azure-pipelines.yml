@@ -4,7 +4,6 @@ trigger:
 jobs:
   - job: JOB1
     displayName: '1: Build/Test/Coverage/Sonar/Docker'
-    #dependsOn: JOB4
     pool:
       vmImage: ubuntu-latest
 
@@ -107,14 +106,14 @@ jobs:
         command: 'login'
       displayName: 'Docker Login'
     
-    #- task: Kubernetes@1
-    #  inputs:
-    #    connectionType: 'None'
-    #    command: 'create'
-    #    arguments: 'deployment microservicespring --image=rcortesz/microservicio-laboratory:$(Build.BuildId)' #132
-    #    secretType: 'dockerRegistry'
-    #    containerRegistryType: 'Azure Container Registry'
-    #  displayName: 'Deploy'
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'None'
+        command: 'create'
+        arguments: 'deployment microservicespring --image=rcortesz/microservicio-laboratory:$(Build.BuildId)' #132
+        secretType: 'dockerRegistry'
+        containerRegistryType: 'Azure Container Registry'
+      displayName: 'Deploy'
 
   - job: JOB3
     displayName: '3: Enabling access to the Service'
@@ -130,11 +129,11 @@ jobs:
         script: 'Start-Sleep -s 10'
       displayName: 'Forward Prepare'
 
-    #- task: PowerShell@2
-    #  inputs:
-    #    targetType: 'inline'
-    #    script: 'kubectl port-forward deploy/microservicespring 8080:8080'
-    #  displayName: 'Running Forward'
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: 'kubectl port-forward deploy/microservicespring 8080:8080'
+      displayName: 'Running Forward'
     
     timeoutInMinutes: 1
 

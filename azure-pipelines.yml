@@ -128,7 +128,7 @@ jobs:
     - task: PowerShell@2
       inputs:
         targetType: 'inline'
-        script: 'kubectl port-forward deploy/microservicespring 8080:8080 &'
+        script: 'kubectl port-forward deploy/microservicespring 8080:8080'
       displayName: 'Forward'
 
   - job: JOB4

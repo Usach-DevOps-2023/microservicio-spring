@@ -104,14 +104,22 @@ jobs:
         command: 'login'
       displayName: 'Docker Login'
     
-    #- task: CmdLine@2
-    #  displayName: 'Run Docker Image'
-    #  inputs:
-    #    script: |
-    #      docker run --rm -p 8080:8080 --name microservicespring rcortesz/microservicio-laboratory:128
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'None'
+        command: 'create'
+        arguments: 'deployment microservicespring --image=rcortesz/microservicio-laboratory:132' #$(Build.BuildId)
+        secretType: 'dockerRegistry'
+        containerRegistryType: 'Azure Container Registry'
+      displayName: 'Deploy'
+
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: 'kubectl port-forward deploy/microservicespring 8080:8080'
 
   - job: JOB3
-    #dependsOn: JOB2
+    dependsOn: JOB2
 
     pool: 'default'
     
@@ -125,6 +133,7 @@ jobs:
           $env:JMETER_HOME = '$(Agent.HomeDirectory)\jmeter\apache-jmeter-5.5'
           $env:PATH += ";$env:JMETER_HOME\bin"
 
-    - script: |
-        jmeter.sh -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl
+    - task: CmdLine@2
+      inputs:
+        script: 'jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl'
       displayName: 'Run JMeter Tests'

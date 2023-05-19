@@ -3,7 +3,7 @@ trigger:
 
 jobs:
   - job: JOB1
-    displayName: Build/Test/Coverage/Sonar/Docker
+    displayName: '1: Build/Test/Coverage/Sonar/Docker'
     #dependsOn: JOB4
     pool:
       vmImage: ubuntu-latest
@@ -89,11 +89,12 @@ jobs:
       inputs:
         containerRegistry: 'Docker'
         repository: 'rcortesz/microservicio-laboratory'
+        tags: $(Build.BuildId)
         command: 'push'
       displayName: 'Docker Push'
 
   - job: JOB2
-    displayName: Deploy Service
+    displayName: '2: Deploy Service in K8s'
     dependsOn: JOB1
 
     pool: 'default'
@@ -106,17 +107,17 @@ jobs:
         command: 'login'
       displayName: 'Docker Login'
     
-    - task: Kubernetes@1
-      inputs:
-        connectionType: 'None'
-        command: 'create'
-        arguments: 'deployment microservicespring --image=rcortesz/microservicio-laboratory:$(Build.BuildId)' #132
-        secretType: 'dockerRegistry'
-        containerRegistryType: 'Azure Container Registry'
-      displayName: 'Deploy'
+    #- task: Kubernetes@1
+    #  inputs:
+    #    connectionType: 'None'
+    #    command: 'create'
+    #    arguments: 'deployment microservicespring --image=rcortesz/microservicio-laboratory:$(Build.BuildId)' #132
+    #    secretType: 'dockerRegistry'
+    #    containerRegistryType: 'Azure Container Registry'
+    #  displayName: 'Deploy'
 
   - job: JOB3
-    displayName: Enabling access to the Service
+    displayName: '3: Enabling access to the Service'
     dependsOn: JOB2
 
     pool: 'DevOps'
@@ -129,16 +130,16 @@ jobs:
         script: 'Start-Sleep -s 10'
       displayName: 'Forward Prepare'
 
-    - task: PowerShell@2
-      inputs:
-        targetType: 'inline'
-        script: 'kubectl port-forward deploy/microservicespring 8080:8080'
-      displayName: 'Running Forward'
+    #- task: PowerShell@2
+    #  inputs:
+    #    targetType: 'inline'
+    #    script: 'kubectl port-forward deploy/microservicespring 8080:8080'
+    #  displayName: 'Running Forward'
     
-    timeoutInMinutes: 1
+    timeoutInMinutes: 0.6
 
   - job: JOB4
-    displayName: Performance Test
+    displayName: '4: Performance Test'
     dependsOn: JOB2
 
     pool: 'default'

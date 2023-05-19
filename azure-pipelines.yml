@@ -148,11 +148,11 @@ jobs:
       displayName: 'Set JMeter Path'
       inputs:
         targetType: 'inline'
-        script: |
-          $env:JMETER_HOME = '$(Agent.HomeDirectory)\jmeter\apache-jmeter-5.5'
-          $env:PATH += ";$env:JMETER_HOME\bin"
+        script: ''
 
     - task: CmdLine@2
       inputs:
-        script: 'jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl'
+        script: |
+          cd $(Agent.HomeDirectory)\jmeter\apache-jmeter-5.5\bin
+          jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl
       displayName: 'Run JMeter Tests'

@@ -92,7 +92,7 @@ jobs:
       displayName: 'Docker Push'
 
   - job: JOB2
-    #dependsOn: JOB1
+    dependsOn: JOB1
 
     pool: 'default'
     
@@ -120,7 +120,7 @@ jobs:
       displayName: 'Sleep'
 
   - job: JOB3
-    dependsOn: JOB1
+    #dependsOn: JOB1
 
     pool: 'default'
     
@@ -128,11 +128,11 @@ jobs:
     - task: PowerShell@2
       inputs:
         targetType: 'inline'
-        script: 'kubectl port-forward deploy/microservicespring 8080:8080'
+        script: 'kubectl port-forward deploy/microservicespring 8080:8080 &'
       displayName: 'Forward'
 
   - job: JOB4
-    dependsOn: JOB2
+    dependsOn: JOB3
 
     pool: 'default'
     

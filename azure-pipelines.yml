@@ -146,8 +146,8 @@ jobs:
           .\jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl
           }
           echo "Finished JMeter Tests"
-          Wait-Job $job
-          Receive-Job $job
+          Stop-Job $job
+          #Receive-Job $job
 
     #- task: CmdLine@2
     #  inputs:

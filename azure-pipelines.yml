@@ -93,7 +93,7 @@ jobs:
       displayName: 'Docker Push'
 
   - job: JOB2
-    displayName: '2: Deploy Service in K8s'
+    displayName: '2: Deploy Service & Performance Test'
     dependsOn: JOB1
 
     pool: 'default'
@@ -122,16 +122,8 @@ jobs:
         containerRegistryType: 'Azure Container Registry'
       displayName: 'Deploy Service K8s'
 
-  - job: JOB3
-    displayName: '3: Performance Test'
-    dependsOn: JOB2
-
-    pool: 'default'
-    
-    steps:
-
     - task: PowerShell@2
-      displayName: 'Performance Test'
+      displayName: 'Run Performance Test'
       inputs:
         targetType: 'inline'
         script: |
@@ -146,12 +138,7 @@ jobs:
           .\jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl
           }
           echo "Finished JMeter Tests"
+          echo "****************************************** Validating Service ******************************************"
+          $req=Invoke-WebRequest -uri "http://localhost:8080/greeting"; Write-output "Status Code: $($req.StatusCode) - Content: $($req.Content)"
+          echo "**************************************** Finalizando Laboratorio ****************************************"
           Stop-Job $job
-          #Receive-Job $job
-
-    #- task: CmdLine@2
-    #  inputs:
-    #    script: |
-    #      cd $(Agent.HomeDirectory)\jmeter\apache-jmeter-5.5\bin
-    #      jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl
-    #  displayName: 'Run JMeter Tests'

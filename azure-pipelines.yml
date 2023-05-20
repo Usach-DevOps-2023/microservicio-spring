@@ -70,6 +70,12 @@ jobs:
         spotBugsAnalysis: false
       displayName: Run SonarCloud
 
+    - task: sonarcloud-buildbreaker@2
+      inputs:
+        SonarCloud: 'SonarCloud'
+        organization: 'usach-devops-2023'
+      displayName: 'Validate Quality Gate'
+
     - task: Docker@2
       inputs:
         containerRegistry: 'Docker'
@@ -135,10 +141,16 @@ jobs:
           echo "Run JMeter Tests"
           Invoke-Command -ScriptBlock {
           cd $(Agent.HomeDirectory)\jmeter\apache-jmeter-5.5\bin
-          .\jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl
+          .\jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl  -e -o $(Agent.HomeDirectory)\jmeter\result
           }
           echo "Finished JMeter Tests"
           echo "****************************************** Validating Service ******************************************"
           $req=Invoke-WebRequest -uri "http://localhost:8080/greeting"; Write-output "Status Code: $($req.StatusCode) - Content: $($req.Content)"
-          echo "**************************************** Finalizando Laboratorio ****************************************"
+          #echo "**************************************** Finalizando Laboratorio ****************************************"
           Stop-Job $job
+    
+    - task: publishhtmlreport@1
+      inputs:
+        htmlType: 'Jmeter'
+        JmeterReportsPath: '$(Agent.HomeDirectory)/jmeter/result'
+      displayName: 'Publish Performance Test Results'

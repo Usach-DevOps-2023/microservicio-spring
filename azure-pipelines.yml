@@ -116,29 +116,7 @@ jobs:
       displayName: 'Deploy'
 
   - job: JOB3
-    displayName: '3: Enabling access to the Service'
-    dependsOn: JOB2
-
-    pool: 'DevOps'
-    
-    steps:
-
-    - task: PowerShell@2
-      inputs:
-        targetType: 'inline'
-        script: 'Start-Sleep -s 10'
-      displayName: 'Forward Prepare'
-
-    - task: PowerShell@2
-      inputs:
-        targetType: 'inline'
-        script: 'kubectl port-forward deploy/microservicespring 8080:8080'
-      displayName: 'Running Forward'
-    
-    timeoutInMinutes: 1
-
-  - job: JOB4
-    displayName: '4: Performance Test'
+    displayName: '3: Performance Test'
     dependsOn: JOB2
 
     pool: 'default'
@@ -148,12 +126,25 @@ jobs:
     - task: PowerShell@2
       inputs:
         targetType: 'inline'
-        script: 'Start-Sleep -s 15'
+        script: 'Start-Sleep -s 10'
       displayName: 'JMeter Prepare'
 
-    - task: CmdLine@2
+    - task: PowerShell@2
+      displayName: 'Run PowerShell Background Job'
       inputs:
+        targetType: 'inline'
         script: |
-          cd $(Agent.HomeDirectory)\jmeter\apache-jmeter-5.5\bin
-          jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl
-      displayName: 'Run JMeter Tests'
+          $job = Start-Job -ScriptBlock {
+              kubectl port-forward deploy/microservicespring 8080:8080
+              cd $(Agent.HomeDirectory)\jmeter\apache-jmeter-5.5\bin
+              jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl
+          }
+          Wait-Job $job
+          Receive-Job $job
+
+    #- task: CmdLine@2
+    #  inputs:
+    #    script: |
+    #      cd $(Agent.HomeDirectory)\jmeter\apache-jmeter-5.5\bin
+    #      jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl
+    #  displayName: 'Run JMeter Tests'

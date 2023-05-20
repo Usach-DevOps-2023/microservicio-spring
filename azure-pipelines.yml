@@ -137,8 +137,10 @@ jobs:
           $job = Start-Job -ScriptBlock {
               kubectl port-forward deploy/microservicespring 8080:8080
           }
+          Invoke-Command -ScriptBlock {
           cd $(Agent.HomeDirectory)\jmeter\apache-jmeter-5.5\bin
-          jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl
+          .\jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl
+          }
           Wait-Job $job
           Receive-Job $job
 

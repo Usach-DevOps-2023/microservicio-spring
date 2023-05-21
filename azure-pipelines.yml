@@ -141,7 +141,9 @@ jobs:
           echo "Run JMeter Tests"
           Invoke-Command -ScriptBlock {
           cd $(Agent.HomeDirectory)\jmeter\apache-jmeter-5.5\bin
-          .\jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.TempDirectory)\jmeter\result\results.jtl -e -o $(Agent.TempDirectory)\jmeter\report -f
+          $container = docker ps -aqf "name=microservicio-laboratory"
+          docker cp -a $container:/app/PerformanceTesting.jmx $(Agent.HomeDirectory)/jmeter/test
+          .\jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl -e -o $(Agent.HomeDirectory)\jmeter\report -f
           }
           echo "Finished JMeter Tests"
           echo "****************************************** Validating Service ******************************************"
@@ -151,5 +153,5 @@ jobs:
     - task: publishhtmlreport@1
       inputs:
         htmlType: 'Jmeter'
-        JmeterReportsPath: '$(Agent.TempDirectory)/jmeter/report'
+        JmeterReportsPath: '$(Agent.HomeDirectory)/jmeter/report'
       displayName: 'Publish Performance Test Results'

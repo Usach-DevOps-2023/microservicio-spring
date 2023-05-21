@@ -12,6 +12,4 @@ public class HomeController {
 		return "Finaliza el curso DevOps Foundation v4 - Rodrigo Cortés";
 	}
 
-	private String password = "DevOps.2023#";
-
 }

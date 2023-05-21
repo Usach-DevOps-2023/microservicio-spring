@@ -141,7 +141,7 @@ jobs:
           echo "Run JMeter Tests"
           Invoke-Command -ScriptBlock {
           cd $(Agent.HomeDirectory)\jmeter\apache-jmeter-5.5\bin
-          .\jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl
+          .\jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl -e -o $(Agent.HomeDirectory)\jmeter\report -f
           }
           echo "Finished JMeter Tests"
           echo "****************************************** Validating Service ******************************************"

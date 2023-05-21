@@ -9,4 +9,7 @@ public class TestingWebApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(TestingWebApplication.class, args);
 	}
+
+	private String password = "Capital.2023#";
+	
 }

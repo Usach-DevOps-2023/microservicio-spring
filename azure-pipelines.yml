@@ -142,7 +142,8 @@ jobs:
           Invoke-Command -ScriptBlock {
           cd $(Agent.HomeDirectory)\jmeter\apache-jmeter-5.5\bin
           $container = docker ps -aqf "name=microservicio-laboratory"
-          docker cp -a $container:/app/PerformanceTesting.jmx $(Agent.HomeDirectory)/jmeter/test
+          echo ${container}
+          docker cp -a ${container}:/app/PerformanceTesting.jmx $(Agent.HomeDirectory)\jmeter\test
           .\jmeter -n -t $(Agent.HomeDirectory)\jmeter\test\PerformanceTesting.jmx -l $(Agent.HomeDirectory)\jmeter\result\results.jtl -e -o $(Agent.HomeDirectory)\jmeter\report -f
           }
           echo "Finished JMeter Tests"

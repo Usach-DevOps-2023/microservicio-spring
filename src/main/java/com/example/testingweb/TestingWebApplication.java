@@ -10,6 +10,4 @@ public class TestingWebApplication {
 		SpringApplication.run(TestingWebApplication.class, args);
 	}
 
-	private String password = "Capital.2023#";
-	
 }
